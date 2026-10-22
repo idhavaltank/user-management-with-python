@@ -1,0 +1,33 @@
+services:
+  # Local PostgreSQL mirrors the production database engine used by FastAPI.
+  # The API connects through DATABASE_URL; Docker only supplies the service.
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-user_management}
+      POSTGRES_USER: ${POSTGRES_USER:-anthropic}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in backend/.env}
+    # Expose standard PostgreSQL locally so Alembic and uvicorn can connect.
+    ports:
+      - "5432:5432"
+    # Named storage survives a normal container restart; ``down -v`` deletes it.
+    volumes:
+      - user-management-postgres:/var/lib/postgresql/data
+    # The healthcheck lets operators distinguish a starting database from a
+    # ready one before running migrations or the API.
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    # Redis is optional locally but becomes the shared rate-limit store when
+    # multiple API instances run in staging or production.
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+volumes:
+  # PostgreSQL data is kept outside the disposable container filesystem.
+  user-management-postgres:

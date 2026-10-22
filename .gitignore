@@ -1,0 +1,9 @@
+# Local secrets and environment-specific configuration.
+.env
+# Virtual environment created by uv.
+.venv/
+# Python bytecode and test/lint caches.
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+*.py[cod]

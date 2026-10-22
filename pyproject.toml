@@ -1,0 +1,41 @@
+[project]
+# Package metadata and runtime dependency bounds for the FastAPI service.
+name = "user-management-api"
+version = "0.1.0"
+description = "FastAPI backend for the user management application"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+  "alembic>=1.14,<2",
+  "argon2-cffi>=23.1,<26",
+  "asyncpg>=0.29,<1",
+  "fastapi>=0.115,<1",
+  "pydantic[email]>=2.8,<3",
+  "pydantic-settings>=2.5,<3",
+  "redis>=5,<7",
+  "sqlalchemy[asyncio]>=2,<3",
+  "uvicorn[standard]>=0.30,<1",
+]
+
+[dependency-groups]
+# Development-only tools used by the verification workflow.
+dev = [
+  "httpx>=0.27,<1",
+  "pytest>=8,<9",
+  "pytest-asyncio>=0.24,<2",
+  "ruff>=0.8,<1",
+]
+
+[tool.pytest.ini_options]
+# Discover tests under backend/tests and use pytest-asyncio automatically.
+asyncio_mode = "auto"
+testpaths = ["tests"]
+
+[tool.ruff]
+# Ruff is the fast formatter/linter gate used by CI and local development.
+line-length = 100
+target-version = "py312"
+exclude = ["app/generated"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+ignore = ["B008"]
